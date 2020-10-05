@@ -17,8 +17,8 @@ $( init );
 function init() {
 
   // Hide the success message
-  $('#successMessage').hide();
-  $('#successMessage').css( {
+  $('#message').hide();
+  $('#message').css( {
     left: '580px',
     top: '250px',
     width: 0,
@@ -31,23 +31,20 @@ function init() {
   $('#cardSlots').html( '' );
 
   // Create the pile of shuffled cards
-  var numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-  var terms = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10' ];
-  // <!--numbers.sort( function() { return Math.random() - .5 } );-->
+  let allcards = [112, 113, 114, 121, 122, 123, 124, 131, 132, 133, 134, 141, 142, 143, 144, 211, 212, 213, 214, 221, 223, 224, 231, 232, 233, 234, 241, 242, 243, 244, 311, 312, 313, 314, 321, 322, 323, 324, 331, 332, 334, 341, 342, 343, 344, 411, 412, 413, 414, 421, 422, 423, 424, 431, 432, 433, 434, 441, 442, 443];
+  allcards.sort(() => Math.random() - 0.5);
+  var cardToDrag = allcards[0];
+  var cardsToDropOn = [111, 222, 333, 444];
 
-  for ( var i=0; i<10; i++ ) {
-    $('<div>' + terms[i] + '</div>').data( 'number', numbers[i] ).attr( 'id', 'card'+numbers[i] ).appendTo( '#cardPile' ).draggable( {
-      
+  $('<div><img src="' + cardToDrag + '.jpg" width="200" height="200"></div>').data( 'number', cardToDrag ).appendTo( '#cardPile' ).draggable( {
       stack: '#cardPile div',
       cursor: 'move',
       revert: true
     } );
-  }
 
   // Create the card slots
-  var words = [ 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten' ];
-  for ( var i=1; i<=10; i++ ) {
-    $('<div>' + words[i-1] + '</div>').data( 'number', i ).appendTo( '#cardSlots' ).droppable( {
+  for ( var i=0; i<=3; i++ ) {
+    $('<div><img src="' + cardsToDropOn[i] + '.jpg" width="200" height="200"></div>').data( 'number', cardsToDropOn[i]).appendTo( '#cardSlots' ).droppable( {
       accept: '#cardPile div',
       hoverClass: 'hovered',
       drop: handleCardDrop
@@ -59,34 +56,33 @@ function init() {
 function handleCardDrop( event, ui ) {
   var slotNumber = $(this).data( 'number' );
   var cardNumber = ui.draggable.data( 'number' );
-
+  cardNumber = Math.floor((cardNumber/100));
+  slotNumber = Math.floor((slotNumber/100));
   // If the card was dropped to the correct slot,
   // change the card colour, position it directly
   // on top of the slot, and prevent it being dragged
   // again
 
   if ( slotNumber == cardNumber ) {
-    ui.draggable.addClass( 'correct' );
-    ui.draggable.draggable( 'disable' );
-    $(this).droppable( 'disable' );
-    ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
-    ui.draggable.draggable( 'option', 'revert', false );
-    correctCards++;
-  } 
-  
-  // If all the cards have been placed correctly then display a message
-  // and reset the cards for another go
-
-  if ( correctCards == 10 ) {
-    $('#successMessage').show();
-    $('#successMessage').animate( {
+    $('#message').html( 'Correct!' );
+    $('#message').css( {
+      background: 'rgb(128, 240, 147)'
+    } );
+  } else {
+    $('#message').html( 'Incorrect!' );
+    $('#message').css( {
+      background: 'rgb(240, 128, 128)'
+    } );
+  }
+  $('#message').show();
+    $('#message').animate( {
       left: '380px',
       top: '200px',
       width: '400px',
       height: '100px',
       opacity: 1
     } );
-  }
+    setTimeout(init, 2000);
 
 }
 
@@ -139,46 +135,52 @@ h1, h2, h3, h4 {
 /* Slots for final card positions */
  
 #cardSlots {
-  margin: 0 auto 3em auto;
+  /* margin: auto 0 auto 3em; */
   background: navy;
-  float: right;
+  /* float: left; */
 }
  
 /* The initial pile of unsorted cards */
  
 #cardPile {
-  margin: 0 auto;
+  /* margin: 0 auto; */
   background: green;
-  float: left;
+  /* float: right; */
 }
  
 #cardSlots, #cardPile {
-  width: 47%;
-  height: 80%;
+  width: 100%;
+  height: 30%;
   padding: .85em;
   border: 2px solid #333;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  -moz-box-shadow: 0 0 .3em rgba(0, 0, 0, .8);
-  -webkit-box-shadow: 0 0 .3em rgba(0, 0, 0, .8);
-  box-shadow: 0 0 .3em rgba(0, 0, 0, .8);
+  border-radius: 5px;
 }
  
 /* Individual cards and slots */
  
-#cardSlots div, #cardPile div {
-  float: left;
+#cardSlots div{
+  /* float: left; */
   width: 43%;
   height: 18%;
   padding: .85em;
-  padding-top: 40px;
-  padding-bottom: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
   border: 2px solid #333;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
   border-radius: 10px;
-  margin: 10px 0 0 10px;
+  /* margin: 10px 0 0 10px; */
+  background: #fff;
+}
+
+#cardPile div {
+  /* float: right; */
+  width: 43%;
+  height: 18%;
+  padding: .85em;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  /* margin: 10px 0 0 10px; */
   background: #fff;
 }
  
@@ -186,13 +188,13 @@ h1, h2, h3, h4 {
   margin-left: 0;
 }*/
  
-#cardSlots div.hovered {
+/* #cardSlots div.hovered {
   background: #aaa;
 }
  
 #cardSlots div {
   border-style: dashed;
-}
+} */
  
 #cardPile div {
   background: #666;
@@ -210,7 +212,7 @@ h1, h2, h3, h4 {
  
 /* Individually coloured cards */
  
-#card1.correct { background: red; }
+/* #card1.correct { background: red; }
 #card2.correct { background: brown; }
 #card3.correct { background: orange; }
 #card4.correct { background: yellow; }
@@ -219,18 +221,17 @@ h1, h2, h3, h4 {
 #card7.correct { background: blue; }
 #card8.correct { background: indigo; }
 #card9.correct { background: purple; }
-#card10.correct { background: violet; }
+#card10.correct { background: violet; } */
  
  
 /* "You did it!" message */
-#successMessage {
+#message {
   position: absolute;
   left: 580px;
   top: 250px;
   width: 0;
   height: 0;
   z-index: 100;
-  background: #dfd;
   border: 2px solid #333;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
@@ -251,21 +252,14 @@ h1, h2, h3, h4 {
 </div>
 
 <div id="content">
-
-  <div id="cardPile"> </div>
   <div id="cardSlots"> </div>
+  <div id="cardPile"> </div>
+  
 
-  <div id="successMessage">
-    <h2>Congratulations!</h2>
-    <button onclick="init()">Play Again</button>
-  </div>
+  <div id="message"></div>
 
 </div>
 
-<div class="wideBox">
-  <p>Original Project & Concept &copy; Elated.com | <a href="http://www.elated.com/articles/drag-and-drop-with-jquery-your-essential-guide/">See Elated.com Tutorial</a></p>
-  <p style="font-size: .8em; line-height: 1.5em;"><a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />This <span xmlns:dc="http://purl.org/dc/elements/1.1/" href="http://purl.org/dc/dcmitype/Text" rel="dc:type">derivative</span> by Mike Wood is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.</p>
-</div>
 
 </body>
 </html>
