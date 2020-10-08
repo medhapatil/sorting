@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 
-<title>A jQuery Drag-and-Drop Number Cards Game</title>
+<title>Game</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -12,18 +12,30 @@
 <script type="text/javascript">
 
 var correctCards = 0;
+var rounds = ['Drag the orange card and drop it onto the purple pile with the same shape', 'Drag the orange card and drop it onto the purple pile with the same number', 'Drag the orange card and drop it onto the purple pile with the same color'];
+var roundType = 1;
+var maxRounds = Math.floor((Math.random() * 3) + 2);
+var numRounds = 0;
+
 $( init );
 
 function init() {
 
+  if (numRounds > maxRounds) {
+    maxRounds = Math.floor((Math.random() * 3) + 2);
+    numRounds = 0;
+    roundType += 1;
+    if (roundType > 3) {
+      roundType = 1;
+    }
+  } else {
+    numRounds += 1;
+  }
+
+  $('#instructions').html(rounds[roundType-1]);
+
   // Hide the success message
   $('#message').hide();
-  $('#message').css( {
-    left: '580px',
-    top: '250px',
-    width: 0,
-    height: 0
-  } );
 
   // Reset the game
   correctCards = 0;
@@ -36,7 +48,7 @@ function init() {
   var cardToDrag = allcards[0];
   var cardsToDropOn = [111, 222, 333, 444];
 
-  $('<div><img src="' + cardToDrag + '.jpg" width="200" height="200"></div>').data( 'number', cardToDrag ).appendTo( '#cardPile' ).draggable( {
+  $('<div><img src="' + cardToDrag + '.jpg" width="200" height="200"></div>').data( 'number', cardToDrag ).attr( 'id', 'cardDrag' ).appendTo( '#cardPile' ).draggable( {
       stack: '#cardPile div',
       cursor: 'move',
       revert: true
@@ -56,37 +68,44 @@ function init() {
 function handleCardDrop( event, ui ) {
   var slotNumber = $(this).data( 'number' );
   var cardNumber = ui.draggable.data( 'number' );
-  cardNumber = Math.floor((cardNumber/100));
-  slotNumber = Math.floor((slotNumber/100));
+  if (roundType == 1) {
+    cardNumber = Math.floor(((cardNumber/10)%10));
+    slotNumber = Math.floor(((slotNumber/10)%10));
+  }
+  if (roundType == 2) {
+    cardNumber = Math.floor((cardNumber/100));
+    slotNumber = Math.floor((slotNumber/100));
+  }
+  if (roundType == 3) {
+    cardNumber = Math.floor((cardNumber%10));
+    slotNumber = Math.floor((slotNumber%10));
+  }
+  
   // If the card was dropped to the correct slot,
   // change the card colour, position it directly
   // on top of the slot, and prevent it being dragged
   // again
+  
   ui.draggable.draggable( 'disable' );
   $(this).droppable( 'disable' );
   ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
   ui.draggable.draggable( 'option', 'revert', false );
 
   if ( slotNumber == cardNumber ) {
-    $('#message').html( 'Correct!' );
+    $('#message').html('Correct!');
     $('#message').css( {
-      background: 'rgb(10, 160, 30)'
+      color: 'rgb(10, 150, 30)'
     } );
+    ui.draggable.addClass( 'correct' );
   } else {
-    $('#message').html( 'Incorrect!' );
+    $('#message').html('Incorrect!');
     $('#message').css( {
-      background: 'rgb(220, 20, 20)'
+      color: 'rgb(240, 30, 30)'
     } );
+    ui.draggable.addClass( 'incorrect' );
   }
   $('#message').show();
-    $('#message').animate( {
-      left: '515px',
-      top: '220px',
-      width: '200px',
-      height: '40px',
-      opacity: 1
-    } );
-    setTimeout(init, 1500);
+  setTimeout(init, 1500);
 
 }
 
@@ -205,33 +224,20 @@ h1, h2, h3, h4 {
  
 /* Individually coloured cards */
  
-/* #card1.correct { background: red; }
-#card2.correct { background: brown; }
-#card3.correct { background: orange; }
-#card4.correct { background: yellow; }
-#card5.correct { background: green; }
-#card6.correct { background: cyan; }
-#card7.correct { background: blue; }
-#card8.correct { background: indigo; }
-#card9.correct { background: purple; }
-#card10.correct { background: violet; } */
+/* /* #card1.correct { background: red; } */
+#cardDrag.correct { background: rgb(100, 255, 100); }
+#cardDrag.incorrect { background: rgb(255, 93, 93); }
  
  
 /* "You did it!" message */
 #message {
   position: absolute;
   z-index: 100;
-  color: white;
   font-weight: bold;
   font-size: 1.5em;
-  border: 2px solid black;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  /* -moz-box-shadow: .3em .3em .5em rgba(0, 0, 0, .8);
-  -webkit-box-shadow: .3em .3em .5em rgba(0, 0, 0, .8);
-  box-shadow: .3em .3em .5em rgba(0, 0, 0, .8); */
-  padding: 20px 20px 10px 20px;
+  left: 550px;
+  top: 420px;
+  padding: 20px 20px 20px 20px;
 }
   </style>
 
@@ -239,7 +245,7 @@ h1, h2, h3, h4 {
 <body>
 
 <div class="wideBox">
-  <h3>Drag the orange card and drop it onto the correct pile</h3>
+  <h3 id="instructions">Drag the orange card and drop it onto the purple pile with the same shape</h3>
 </div>
 
 <div id="content">
