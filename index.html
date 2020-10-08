@@ -13,7 +13,7 @@
 
 var correctCards = 0;
 var rounds = ['Drag the orange card and drop it onto the purple pile with the same shape', 'Drag the orange card and drop it onto the purple pile with the same number', 'Drag the orange card and drop it onto the purple pile with the same color'];
-var roundType = 1;
+var roundType = Math.floor((Math.random() * 2) + 1);
 var maxRounds = Math.floor((Math.random() * 3) + 2);
 var numRounds = 0;
 
@@ -24,9 +24,9 @@ function init() {
   if (numRounds > maxRounds) {
     maxRounds = Math.floor((Math.random() * 3) + 2);
     numRounds = 0;
-    roundType += 1;
+    roundType += 2;
     if (roundType > 3) {
-      roundType = 1;
+      roundType -= 3;
     }
   } else {
     numRounds += 1;
